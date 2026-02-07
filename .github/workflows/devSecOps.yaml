@@ -28,8 +28,7 @@ jobs:
     
     # 3. CI – Tests por microservicio
     - name: Run tests (app.js)
-      run: |        
-        npm ci
+      run: |
         npm run lint
         npm test
   
