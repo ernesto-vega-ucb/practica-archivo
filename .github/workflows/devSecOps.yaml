@@ -1,0 +1,46 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+jobs:
+  devsecops:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Obtener código
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    # 2. Coding - SCA
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    
+    - name: Install dependencies
+      run: npm ci
+
+    - name: SCA – Dependency vulnerability scan
+      run: npm audit --audit-level=high
+    
+    # 3. CI – Tests por microservicio
+    - name: Run tests (app.js)
+      run: |        
+        npm ci
+        npm run lint
+        npm test
+  
+    # 4. 🔐 SAST – Análisis estático de código
+    - name: Install Semgrep
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install semgrep
+
+    - name: SAST APP
+      run: |
+        semgrep --config=auto --severity=ERROR
+    
+    
